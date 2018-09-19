@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
 
-var Schema = mongoose.Schema;
+var Schema = mongoose.Schema
 
 var ArticleSchema = new Schema({
   title: {
@@ -13,10 +13,10 @@ var ArticleSchema = new Schema({
   },
   note: {
     type: Schema.Types.ObjectID,
-    ref: "Note"
+    ref: 'Note'
   }
-});
+})
 
-const Article = mongoose.model("Article", ArticleSchema);
+const Article = mongoose.model('Article', ArticleSchema)
 
-module.exports = Article;
+module.exports = Article

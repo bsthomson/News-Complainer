@@ -1,13 +1,14 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const saltRounds = 10
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
 
 var UserSchema = new Schema({
   userName: {
     type: String,
-    required: true
+    required: true,
+    index: { unique: true }
   },
   password: {
     type: String,
@@ -15,21 +16,28 @@ var UserSchema = new Schema({
   },
   article: {
     type: Schema.Types.ObjectId,
-    ref: "Article"
+    ref: 'Article'
   }
-});
+})
 
-UserSchema.pre('save', function (next){
-  let user = this;
-  if (!user.isModified('password')) return next();
+UserSchema.pre('save', function (next) {
+  let user = this
+  if (!user.isModified('password')) return next()
 
   bcrypt.hash(user.passord, saltRounds, function (err, hash) {
-    if (err) return (err);
-    user.password = hash;
-    next();
+    if (err) return (err)
+    user.password = hash
+    next()
   })
 })
 
-const User = mongoose.model('User', UserSchema);
+UserSchema.methods.comparePassword = function (candidatePassword, cb) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) return cb(err)
+    cb(null, isMatch)
+  })
+}
 
-module.exports = User;
+const User = mongoose.model('User', UserSchema)
+
+module.exports = User
