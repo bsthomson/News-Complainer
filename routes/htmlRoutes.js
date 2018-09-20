@@ -1,3 +1,7 @@
+const axios = require('axios')
+const cheerio = require('cheerio')
+//  const request = require('request')
+
 var db = require('../models')
 
 module.exports = function (app) {
@@ -40,6 +44,7 @@ module.exports = function (app) {
       const username = req.body.username
       const password = req.body.password
       db.User.findOne({ userName: username })
+        .populate('article')
         .then(function (user) {
           if (!user) {
             res.redirect('/login')
@@ -60,6 +65,36 @@ module.exports = function (app) {
     } else {
       res.redirect('/login')
     }
+  })
+
+  app.get('/scrape', function (req, res) {
+    axios.get('http://www.politico.com/')
+      .then(function (response) {
+        console.log(response)
+        const $ = cheerio.load(response.data)
+
+        $('headline h1').each(function (i, element) {
+          let result = {}
+
+          result.title = $(this)
+            .children('a')
+            .text()
+          result.link = $(this)
+            .children('a')
+            .attr('href')
+
+          db.Article.create(result)
+            .populate
+            .then(function (dbArticle) {
+              console.log(dbArticle)
+            })
+            .catch(function (err) {
+              return res.json(err)
+            })
+        })
+
+        res.send('Scrape Complete')
+      })
   })
 
   app.get('/logout', (req, res) => {

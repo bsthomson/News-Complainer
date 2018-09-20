@@ -40,7 +40,7 @@ app.use((req, res, next) => {
   next()
 })
 
-// require('./routes/apiRoutes')(app);
+//  require('./routes/apiRoutes')(app)
 require('./routes/htmlRoutes')(app)
 
 mongoose.Promise = Promise
