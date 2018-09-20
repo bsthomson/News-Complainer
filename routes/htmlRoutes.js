@@ -61,7 +61,14 @@ module.exports = function (app) {
 
   app.get('/dashboard', (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
-      res.render('dashboard')
+      db.Article.find({})
+        .then(function (data) {
+          const hbsObject = {
+            articles: data
+          }
+          console.log(hbsObject)
+          res.render('dashboard', hbsObject)
+        })
     } else {
       res.redirect('/login')
     }
@@ -70,7 +77,6 @@ module.exports = function (app) {
   app.get('/scrape', function (req, res) {
     axios.get('http://www.politico.com/')
       .then(function (response) {
-        console.log(response)
         const $ = cheerio.load(response.data)
 
         $('headline h1').each(function (i, element) {
@@ -84,7 +90,7 @@ module.exports = function (app) {
             .attr('href')
 
           db.Article.create(result)
-            .populate
+            .populate('note')
             .then(function (dbArticle) {
               console.log(dbArticle)
             })
@@ -93,7 +99,7 @@ module.exports = function (app) {
             })
         })
 
-        res.send('Scrape Complete')
+        res.send('response')
       })
   })
 
