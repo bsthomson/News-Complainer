@@ -17,21 +17,13 @@ module.exports = function (app) {
     .get(sessionChecker, (req, res) => {
       res.render('signup')
     })
-    .then(user => {
-      if (req.body.passwordsignup !== req.body.confirmpw) {
-        alert('Passwords do not match!')
-        res.redirect('/signup')
-      } else {
-        next()
-      }
-    })
     .post((req, res) => {
       db.User.create({
         userName: req.body.usernamesignup,
         password: req.body.passwordsignup
       })
         .then(user => {
-          req.session.user = user.dataValues
+          req.session.user = user.userName
           res.redirect('/dashboard')
         })
         .catch(error => {
@@ -47,17 +39,19 @@ module.exports = function (app) {
     .post((req, res) => {
       const username = req.body.username
       const password = req.body.password
-      db.User.findOne({ username: username })
+      db.User.findOne({ userName: username })
         .then(function (user) {
           if (!user) {
             res.redirect('/login')
           } else if (!user.comparePassword(password)) {
+            console.log('!password')
             res.redirect('/login')
           } else {
-            req.session.user = user.dataValues
+            req.session.user = user.userName
             res.redirect('/dashboard')
           }
         })
+        .catch(error => console.log(error))
     })
 
   app.get('/dashboard', (req, res) => {

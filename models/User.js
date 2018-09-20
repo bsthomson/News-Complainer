@@ -21,21 +21,20 @@ var UserSchema = new Schema({
 })
 
 UserSchema.pre('save', function (next) {
-  let user = this
+  const user = this
   if (!user.isModified('password')) return next()
-
-  bcrypt.hash(user.passord, saltRounds, function (err, hash) {
-    if (err) return (err)
-    user.password = hash
-    next()
+  bcrypt.genSalt(saltRounds, function (err, salt) {
+    if (err) return next(err)
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) return next(err)
+      user.password = hash
+      next()
+    })
   })
 })
 
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) return cb(err)
-    cb(null, isMatch)
-  })
+UserSchema.methods.comparePassword = function (candidatePassword) {
+  return bcrypt.compareSync(candidatePassword, this.password)
 }
 
 const User = mongoose.model('User', UserSchema)
