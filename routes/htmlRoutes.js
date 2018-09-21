@@ -14,7 +14,7 @@ module.exports = function (app) {
   }
 
   app.get('/', sessionChecker, (req, res) => {
-    res.redirect('/signup')
+    res.redirect('/login')
   })
 
   app.route('/signup')
@@ -66,8 +66,10 @@ module.exports = function (app) {
           const hbsObject = {
             articles: data
           }
-          console.log(hbsObject)
           res.render('dashboard', hbsObject)
+        })
+        .catch(function (err) {
+          throw err
         })
     } else {
       res.redirect('/login')
@@ -79,7 +81,7 @@ module.exports = function (app) {
       .then(function (response) {
         const $ = cheerio.load(response.data)
 
-        $('headline h1').each(function (i, element) {
+        $('h1.headline').each(function (i, element) {
           let result = {}
 
           result.title = $(this)
@@ -88,15 +90,13 @@ module.exports = function (app) {
           result.link = $(this)
             .children('a')
             .attr('href')
-
           db.Article.create(result)
-            .populate('note')
             .then(function (dbArticle) {
-              console.log(dbArticle)
+                console.log('this is dbArticle ' + dbArticle)
             })
             .catch(function (err) {
               return res.json(err)
-            })
+            })  
         })
 
         res.send('response')
