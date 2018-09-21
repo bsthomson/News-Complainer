@@ -1,6 +1,10 @@
 {
   "name": "news-complainer",
   "version": "1.0.0",
+  "engines": {
+    "node": "8.11.1",
+    "npm": "6.4.1"
+  },
   "description": "",
   "main": "server.js",
   "scripts": {
