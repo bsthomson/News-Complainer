@@ -62,10 +62,12 @@ module.exports = function (app) {
   app.get('/dashboard', (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
       db.Article.find({})
+        .populate('note')
         .then(function (data) {
           const hbsObject = {
             articles: data
           }
+          console.log(hbsObject)
           res.render('dashboard', hbsObject)
         })
         .catch(function (err) {
@@ -92,11 +94,11 @@ module.exports = function (app) {
             .attr('href')
           db.Article.create(result)
             .then(function (dbArticle) {
-                console.log('this is dbArticle ' + dbArticle)
+              console.log('this is dbArticle ' + dbArticle)
             })
             .catch(function (err) {
               return res.json(err)
-            })  
+            })
         })
 
         res.send('response')
